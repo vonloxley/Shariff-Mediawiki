@@ -48,7 +48,7 @@ function shariffLikeParserFunction_Render( &$parser, $param1 = '', $param2 = '',
 	global $wgScriptPath;
 	
 	//Get page title and URL
-	$output = '<div class="shariff" data-backend-url="'.$wgScriptPath.'/extensions/Shariff/shariff-backend/"></div>';
+	$output = '<div class="shariff noprint" data-backend-url="'.$wgScriptPath.'/extensions/Shariff/shariff-backend/"></div>';
 
 	return $parser->insertStripItem($output, $parser->mStripState);;
 }
