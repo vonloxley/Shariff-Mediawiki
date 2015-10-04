@@ -135,10 +135,10 @@ class Url
         $password = null,
         $port = null,
         $path = null,
-        Query $query = null,
+        $query = null,
         $fragment = null
     ) {
-        $this->scheme = $scheme;
+        $this->scheme = strtolower($scheme);
         $this->host = $host;
         $this->port = $port;
         $this->username = $username;
@@ -234,7 +234,7 @@ class Url
             $this->port = null;
         }
 
-        $this->scheme = $scheme;
+        $this->scheme = strtolower($scheme);
     }
 
     /**

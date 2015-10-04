@@ -20,6 +20,7 @@ class StreamHandlerTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
+        $this->assertEquals('1.1', $response['version']);
         $this->assertEquals(200, $response['status']);
         $this->assertEquals('OK', $response['reason']);
         $this->assertEquals(['Bar'], $response['headers']['Foo']);
@@ -41,7 +42,10 @@ class StreamHandlerTest extends \PHPUnit_Framework_TestCase
             'headers'     => ['host' => ['localhost:123']],
             'client'      => ['timeout' => 0.01],
         ]);
-
+        $this->assertInstanceOf(
+            'GuzzleHttp\Ring\Future\CompletedFutureArray',
+            $result
+        );
         $this->assertNull($result['status']);
         $this->assertNull($result['body']);
         $this->assertEquals([], $result['headers']);

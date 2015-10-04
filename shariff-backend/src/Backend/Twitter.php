@@ -1,22 +1,37 @@
 <?php
+
 namespace Heise\Shariff\Backend;
 
+/**
+ * Class Twitter
+ *
+ * @package Heise\Shariff\Backend
+ */
 class Twitter extends Request implements ServiceInterface
 {
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return 'twitter';
     }
 
+    /**
+     * @param string $url
+     * @return \GuzzleHttp\Message\Request|\GuzzleHttp\Message\RequestInterface
+     */
     public function getRequest($url)
     {
-        //$twitterUrl = 'http://urls.api.twitter.com/1/urls/count.json?url=' . $url;
-        $twitterUrl = 'https://cdn.api.twitter.com/1/urls/count.json?url=' . urlencode($url);
-        return $this->createRequest($twitterUrl);
+        return $this->createRequest('https://cdn.api.twitter.com/1/urls/count.json?url='.urlencode($url));
     }
 
-    public function extractCount($data)
+    /**
+     * @param array $data
+     * @return int
+     */
+    public function extractCount(array $data)
     {
         return $data['count'];
     }

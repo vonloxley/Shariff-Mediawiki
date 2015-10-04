@@ -1,23 +1,55 @@
 <?php
+
 namespace Heise\Shariff\Backend;
 
+use GuzzleHttp\Client;
+
+/**
+ * Class Request
+ *
+ * @package Heise\Shariff\Backend
+ */
 abstract class Request
 {
-
+    /** @var Client */
     protected $client;
 
-    public function __construct()
+    /** @var array */
+    protected $config;
+
+    /**
+     * @param Client $client
+     */
+    public function __construct(Client $client)
     {
-        $this->client = new \GuzzleHttp\Client();
+        $this->client = $client;
     }
 
-    protected function createRequest($url, $method = 'GET', $json = null)
+    /**
+     * @param string $url
+     * @param string $method
+     * @param array $options
+     * @return \GuzzleHttp\Message\Request
+     */
+    protected function createRequest($url, $method = 'GET', $options = array())
     {
+        // $defaults = array('future' => true, 'debug' => true);
+        $defaults = array('future' => true, 'timeout' => 5.0);
+
         $req = $this->client->createRequest(
             $method,
             $url,
-            ['future' => true, 'json' => $json]
+            array_merge($defaults, $options)
         );
+
         return $req;
+    }
+
+    /**
+     * @param array $config
+     */
+    public function setConfig(array $config)
+    {
+        $this->config = $config;
     }
 }

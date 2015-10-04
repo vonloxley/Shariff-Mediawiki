@@ -266,4 +266,37 @@ class RedirectTest extends \PHPUnit_Framework_TestCase
             $response->getEffectiveUrl()
         );
     }
+
+    public function testUpperCaseScheme()
+    {
+        $client = new Client(['base_url' => 'http://www.foo.com']);
+        $client->getEmitter()->attach(new Mock([
+            "HTTP/1.1 301 Moved Permanently\r\nLocation: HTTP://www.bar.com\r\nContent-Length: 0\r\n\r\n",
+            "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n"
+        ]));
+        $response = $client->get('/');
+        $this->assertEquals(
+            'http://www.bar.com',
+            $response->getEffectiveUrl()
+        );
+    }
+
+    /**
+     * @expectedException \GuzzleHttp\Exception\BadResponseException
+     * @expectedExceptionMessage Redirect URL, https://foo.com/redirect2, does not use one of the allowed redirect protocols: http
+     */
+    public function testThrowsWhenRedirectingToInvalidUrlProtocol()
+    {
+        $mock = new Mock([
+            "HTTP/1.1 301 Moved Permanently\r\nLocation: /redirect1\r\nContent-Length: 0\r\n\r\n",
+            "HTTP/1.1 301 Moved Permanently\r\nLocation: https://foo.com/redirect2\r\nContent-Length: 0\r\n\r\n"
+        ]);
+        $client = new Client();
+        $client->getEmitter()->attach($mock);
+        $client->get('http://www.example.com/foo', [
+            'allow_redirects' => [
+                'protocols' => ['http']
+            ]
+        ]);
+    }
 }
