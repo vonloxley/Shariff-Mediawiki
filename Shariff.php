@@ -14,9 +14,11 @@
 $wgExtensionCredits['other'][] = array(
 	'path' => __FILE__,
 	'name' => 'Shariff', 
+	'version' => '1.0',
 	'author' => 'Niki Hansche', 
 	'url' => 'https://github.com/vonloxley/Shariff-Mediawiki',
 	'description' => 'Insert 2-click "Like" buttons.',
+	'license-name' => 'MIT'
 );
 
 $wgResourceModules['ext.Shariff'] = array(
