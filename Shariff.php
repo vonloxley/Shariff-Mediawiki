@@ -19,6 +19,15 @@ $wgExtensionCredits['other'][] = array(
 	'description' => 'Insert 2-click "Like" buttons.',
 );
 
+$wgResourceModules['ext.Shariff'] = array(
+	'scripts' => 'shariff.min.js',
+	'styles' => 'shariff.min.css',
+	'position' => 'bottom',
+
+	'localBasePath' => __DIR__,
+	'remoteExtPath' => 'Shariff',
+);
+
 $wgHooks['ParserFirstCallInit'][] = 'shariffLikeParserFunction_Setup';
 $wgHooks['LanguageGetMagic'][]       = 'shariffLikeParserFunction_Magic';
 $wgHooks['BeforePageDisplay'][] = 'shariffLikeParserFeedHead';
@@ -36,9 +45,8 @@ function shariffLikeParserFunction_Magic( &$magicWords, $langCode ) {
 }
 
 function shariffLikeParserFeedHead(&$out, &$sk) {
-	global $wgScriptPath;
-	$out->addHeadItem('shariff.min.css','<link rel="stylesheet" type="text/css" href="'.$wgScriptPath.'/extensions/Shariff/shariff.min.css" />');
-	$out->addScript('<script type="text/javascript" src="'.$wgScriptPath.'/extensions/Shariff/shariff.min.js"></script>');
+	$out->addModules( 'ext.Shariff' );
+
 	return $out;
 }
 
