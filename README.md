@@ -11,5 +11,6 @@ Setup
    `"domain":` to your domain name.
 3. Add `require_once("$IP/extensions/Shariff/Shariff.php");` to
    `LocalSettings.php`
-4. Write `{{#shariffLike:}}` wherever you want to use social-media-buttons.
+4. Copy or link the `fonts` folder to your web-root.
+5. Write `{{#shariffLike:}}` wherever you want to use social-media-buttons.
 
