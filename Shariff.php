@@ -49,7 +49,7 @@ function shariffLikeParserFunction_Magic( &$magicWords, $langCode ) {
 function shariffLikeParserFeedHead(&$out, &$sk) {
 	$out->addModules( 'ext.Shariff' );
 
-	return $out;
+	return true;
 }
 
  
