@@ -2,14 +2,15 @@
 
 namespace Heise\Shariff\Backend;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Pool;
 use Heise\Shariff\CacheInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 /**
- * Class BackendManager
- *
- * @package Heise\Shariff\Backend
+ * Class BackendManager.
  */
 class BackendManager
 {
@@ -19,62 +20,71 @@ class BackendManager
     /** @var CacheInterface */
     protected $cache;
 
-    /** @var Client */
+    /** @var ClientInterface */
     protected $client;
 
-    /** @var string */
-    protected $domain;
+    /** @var array */
+    protected $domains = [];
 
     /** @var ServiceInterface[] */
     protected $services;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
-     * @param string $baseCacheKey
-     * @param CacheInterface $cache
-     * @param Client $client
-     * @param string $domain
+     * @param string             $baseCacheKey
+     * @param CacheInterface     $cache
+     * @param ClientInterface    $client
+     * @param array|string       $domains
      * @param ServiceInterface[] $services
      */
-    public function __construct($baseCacheKey, CacheInterface $cache, Client $client, $domain, array $services)
-    {
+    public function __construct(
+        $baseCacheKey,
+        CacheInterface $cache,
+        ClientInterface $client,
+        $domains,
+        array $services
+    ) {
         $this->baseCacheKey = $baseCacheKey;
         $this->cache = $cache;
         $this->client = $client;
-        $this->domain = $domain;
+        if (is_array($domains)) {
+            $this->domains = $domains;
+        } elseif (is_string($domains)) {
+            trigger_error(
+                'Passing a domain string is deprecated since 5.1, please use an array instead.',
+                E_USER_DEPRECATED
+            );
+            $this->domains = [$domains];
+        }
         $this->services = $services;
     }
 
     /**
-     * @param string $url
-     * @return bool
+     * @param LoggerInterface $logger
      */
-    private function isValidDomain($url)
+    public function setLogger(LoggerInterface $logger = null)
     {
-        if ($this->domain) {
-            $parsed = parse_url($url);
-            if ($parsed["host"] != $this->domain) {
-                return false;
-            }
-        }
-        return true;
+        $this->logger = $logger;
     }
 
     /**
      * @param string $url
+     *
      * @return array|mixed|null
      */
     public function get($url)
     {
-
-        // Aenderungen an der Konfiguration invalidieren den Cache
-        $cache_key = md5($url.$this->baseCacheKey);
+        // Changing configuration invalidates the cache
+        $cacheKey = md5($url.$this->baseCacheKey);
 
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             return null;
         }
 
-        if ($this->cache->hasItem($cache_key)) {
-            return json_decode($this->cache->getItem($cache_key), true);
+        if ($this->cache->hasItem($cacheKey)) {
+            return json_decode($this->cache->getItem($cacheKey), true);
         }
 
         if (!$this->isValidDomain($url)) {
@@ -83,29 +93,54 @@ class BackendManager
 
         $requests = array_map(
             function ($service) use ($url) {
-                /** @var ServiceInterface $service */
+                /* @var ServiceInterface $service */
                 return $service->getRequest($url);
             },
             $this->services
         );
 
+        /** @var ResponseInterface[]|TransferException[] $results */
         $results = Pool::batch($this->client, $requests);
 
-        $counts = array();
+        $counts = [];
         $i = 0;
         foreach ($this->services as $service) {
-            if (method_exists($results[$i], "json")) {
+            if ($results[$i] instanceof TransferException) {
+                if ($this->logger !== null) {
+                    $this->logger->warning($results[$i]->getMessage(), ['exception' => $results[$i]]);
+                }
+            } else {
                 try {
-                    $counts[ $service->getName() ] = (int)$service->extractCount($results[$i]->json());
+                    $content = $service->filterResponse($results[$i]->getBody()->getContents());
+                    $json = json_decode($content, true);
+                    $counts[$service->getName()] = is_array($json) ? (int) $service->extractCount($json) : 0;
                 } catch (\Exception $e) {
-                    // Skip service if broken
+                    if ($this->logger !== null) {
+                        $this->logger->warning($e->getMessage(), ['exception' => $e]);
+                    }
                 }
             }
-            $i++;
+            ++$i;
         }
 
-        $this->cache->setItem($cache_key, json_encode($counts));
+        $this->cache->setItem($cacheKey, json_encode($counts));
 
         return $counts;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return bool
+     */
+    private function isValidDomain($url)
+    {
+        if (!empty($this->domains)) {
+            $parsed = parse_url($url);
+
+            return in_array($parsed['host'], $this->domains, true);
+        }
+
+        return true;
     }
 }

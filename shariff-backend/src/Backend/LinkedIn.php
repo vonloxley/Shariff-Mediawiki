@@ -3,15 +3,12 @@
 namespace Heise\Shariff\Backend;
 
 /**
- * Class LinkedIn
- *
- * @package Heise\Shariff\Backend
+ * Class LinkedIn.
  */
 class LinkedIn extends Request implements ServiceInterface
 {
-
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -19,21 +16,21 @@ class LinkedIn extends Request implements ServiceInterface
     }
 
     /**
-     * @param string $url
-     * @return \GuzzleHttp\Message\Request|\GuzzleHttp\Message\RequestInterface
+     * {@inheritdoc}
      */
     public function getRequest($url)
     {
-        $url = 'https://www.linkedin.com/countserv/count/share?url='.urlencode($url).'&lang=de_DE&format=json';
-        return $this->createRequest($url);
+        return new \GuzzleHttp\Psr7\Request(
+            'GET',
+            'https://www.linkedin.com/countserv/count/share?url='.urlencode($url).'&lang=de_DE&format=json'
+        );
     }
 
     /**
-     * @param array $data
-     * @return int
+     * {@inheritdoc}
      */
     public function extractCount(array $data)
     {
-        return $data['count'];
+        return isset($data['count']) ? $data['count'] : 0;
     }
 }

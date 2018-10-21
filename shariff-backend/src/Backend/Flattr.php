@@ -3,15 +3,12 @@
 namespace Heise\Shariff\Backend;
 
 /**
- * Class Flattr
- *
- * @package Heise\Shariff\Backend
+ * Class Flattr.
  */
 class Flattr extends Request implements ServiceInterface
 {
-
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -19,18 +16,18 @@ class Flattr extends Request implements ServiceInterface
     }
 
     /**
-     * @param string $url
-     * @return \GuzzleHttp\Message\Request|\GuzzleHttp\Message\RequestInterface
+     * {@inheritdoc}
      */
     public function getRequest($url)
     {
-        $url = 'https://api.flattr.com/rest/v2/things/lookup/?url='.urlencode($url);
-        return $this->createRequest($url);
+        return new \GuzzleHttp\Psr7\Request(
+            'GET',
+            'https://api.flattr.com/rest/v2/things/lookup/?url='.urlencode($url)
+        );
     }
 
     /**
-     * @param array $data
-     * @return int
+     * {@inheritdoc}
      */
     public function extractCount(array $data)
     {

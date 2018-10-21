@@ -5,11 +5,10 @@ namespace Heise\Shariff;
 use GuzzleHttp\Client;
 use Heise\Shariff\Backend\BackendManager;
 use Heise\Shariff\Backend\ServiceFactory;
+use Psr\Log\LoggerInterface;
 
 /**
- * Class Backend
- *
- * @package Heise\Shariff
+ * Class Backend.
  */
 class Backend
 {
@@ -21,12 +20,17 @@ class Backend
      */
     public function __construct($config)
     {
-        $domain = $config['domain'];
+        $domains = $config['domains'];
+        // stay compatible to old configs
+        if (isset($config['domain'])) {
+            array_push($domains, $config['domain']);
+        }
+
         $clientOptions = [];
         if (isset($config['client'])) {
             $clientOptions = $config['client'];
         }
-        $client = new Client(['defaults' => $clientOptions]);
+        $client = new Client($clientOptions);
         $baseCacheKey = md5(json_encode($config));
 
         if (isset($config['cacheClass'])) {
@@ -41,17 +45,26 @@ class Backend
             $baseCacheKey,
             $cache,
             $client,
-            $domain,
+            $domains,
             $serviceFactory->getServicesByName($config['services'], $config)
         );
     }
 
     /**
      * @param string $url
+     *
      * @return array
      */
     public function get($url)
     {
         return $this->backendManager->get($url);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->backendManager->setLogger($logger);
     }
 }

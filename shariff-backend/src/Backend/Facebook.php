@@ -3,14 +3,12 @@
 namespace Heise\Shariff\Backend;
 
 /**
- * Class Facebook
- *
- * @package Heise\Shariff\Backend
+ * Class Facebook.
  */
 class Facebook extends Request implements ServiceInterface
 {
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -18,50 +16,43 @@ class Facebook extends Request implements ServiceInterface
     }
 
     /**
-     * @param string $url
-     * @return \GuzzleHttp\Message\Request
+     * {@inheritdoc}
+     */
+    public function setConfig(array $config)
+    {
+        if (empty($config['app_id']) || empty($config['secret'])) {
+            throw new \InvalidArgumentException('The Facebook app_id and secret must not be empty.');
+        }
+        parent::setConfig($config);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getRequest($url)
     {
-        $accessToken = $this->getAccessToken();
-        if (null !== $accessToken) {
-            $query = 'https://graph.facebook.com/v2.2/?id=' . $url . '&' . $accessToken;
-        } else {
-            $query = 'https://graph.facebook.com/fql?q=SELECT total_count FROM link_stat WHERE url="'.$url.'"';
-        }
-        return $this->createRequest($query);
+        $accessToken = urlencode($this->config['app_id']) .'|'.urlencode($this->config['secret']);
+        $query = 'https://graph.facebook.com/v3.1/?id='.urlencode($url) . '&fields=engagement&access_token='
+            . $accessToken;
+
+        return new \GuzzleHttp\Psr7\Request('GET', $query);
     }
 
     /**
-     * @param array $data
-     * @return int
+     * {@inheritdoc}
      */
     public function extractCount(array $data)
     {
-        if (isset($data['data']) && isset($data['data'][0]) && isset($data['data'][0]['total_count'])) {
-            return $data['data'][0]['total_count'];
-        }
-        if (isset($data['share']) && isset($data['share']['share_count'])) {
-            return $data['share']['share_count'];
+        if (isset(
+            $data['engagement']['reaction_count'],
+            $data['engagement']['comment_count'],
+            $data['engagement']['share_count']
+        )) {
+            return $data['engagement']['reaction_count']
+                + $data['engagement']['comment_count']
+                + $data['engagement']['share_count'];
         }
 
         return 0;
-    }
-
-    /**
-     * @return \GuzzleHttp\Stream\StreamInterface|null
-     */
-    protected function getAccessToken()
-    {
-        if (isset($this->config['app_id']) && isset($this->config['secret'])) {
-            try {
-                $url = 'https://graph.facebook.com/oauth/access_token?client_id=' .  $this->config['app_id']
-                  . '&client_secret=' . $this->config['secret'] . '&grant_type=client_credentials';
-                $request = $this->client->createRequest('GET', $url);
-                return $this->client->send($request)->getBody(true);
-            } catch (\Exception $e) {
-            }
-        }
-        return null;
     }
 }

@@ -22,7 +22,7 @@ class PriorityList implements Iterator, Countable
      *
      * @var array[]
      */
-    protected $items = array();
+    protected $items = [];
 
     /**
      * Serial assigned to items to preserve LIFO.
@@ -62,14 +62,17 @@ class PriorityList implements Iterator, Countable
      */
     public function insert($name, $value, $priority = 0)
     {
-        $this->sorted = false;
-        $this->count++;
+        if (! isset($this->items[$name])) {
+            $this->count++;
+        }
 
-        $this->items[$name] = array(
+        $this->sorted = false;
+
+        $this->items[$name] = [
             'data'     => $value,
             'priority' => (int) $priority,
             'serial'   => $this->serial++,
-        );
+        ];
     }
 
     /**
@@ -82,7 +85,7 @@ class PriorityList implements Iterator, Countable
      */
     public function setPriority($name, $priority)
     {
-        if (!isset($this->items[$name])) {
+        if (! isset($this->items[$name])) {
             throw new \Exception("item $name not found");
         }
 
@@ -114,7 +117,7 @@ class PriorityList implements Iterator, Countable
      */
     public function clear()
     {
-        $this->items  = array();
+        $this->items  = [];
         $this->serial = 0;
         $this->count  = 0;
         $this->sorted = false;
@@ -128,7 +131,7 @@ class PriorityList implements Iterator, Countable
      */
     public function get($name)
     {
-        if (!isset($this->items[$name])) {
+        if (! isset($this->items[$name])) {
             return;
         }
 
@@ -142,8 +145,8 @@ class PriorityList implements Iterator, Countable
      */
     protected function sort()
     {
-        if (!$this->sorted) {
-            uasort($this->items, array($this, 'compare'));
+        if (! $this->sorted) {
+            uasort($this->items, [$this, 'compare']);
             $this->sorted = true;
         }
     }
@@ -158,7 +161,7 @@ class PriorityList implements Iterator, Countable
     protected function compare(array $item1, array $item2)
     {
         return ($item1['priority'] === $item2['priority'])
-            ? ($item1['serial']   > $item2['serial']   ? -1 : 1) * $this->isLIFO
+            ? ($item1['serial'] > $item2['serial'] ? -1 : 1) * $this->isLIFO
             : ($item1['priority'] > $item2['priority'] ? -1 : 1);
     }
 

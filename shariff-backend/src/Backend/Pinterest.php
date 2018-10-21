@@ -2,20 +2,13 @@
 
 namespace Heise\Shariff\Backend;
 
-use GuzzleHttp\Event\CompleteEvent;
-use GuzzleHttp\Stream\Stream;
-use GuzzleHttp\Message\Response;
-
 /**
- * Class Pinterest
- *
- * @package Heise\Shariff\Backend
+ * Class Pinterest.
  */
 class Pinterest extends Request implements ServiceInterface
 {
-
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -23,27 +16,29 @@ class Pinterest extends Request implements ServiceInterface
     }
 
     /**
-     * @param string $url
-     * @return \GuzzleHttp\Message\Request|\GuzzleHttp\Message\RequestInterface
+     * {@inheritdoc}
      */
     public function getRequest($url)
     {
-        $url = 'http://api.pinterest.com/v1/urls/count.json?callback=x&url='.urlencode($url);
-        $request = $this->createRequest($url);
-        $request->getEmitter()->on('complete', function (CompleteEvent $e) {
-            // Stripping the 'callback function' from the response
-            $body = $e->getResponse()->getBody()->getContents();
-            $e->intercept(new Response(200, array(), (Stream::factory(mb_substr($body, 2, mb_strlen($body) - 3)))));
-        });
-        return $request;
+        return new \GuzzleHttp\Psr7\Request(
+            'GET',
+            'http://api.pinterest.com/v1/urls/count.json?callback=x&url='.urlencode($url)
+        );
     }
 
     /**
-     * @param array $data
-     * @return int
+     * {@inheritdoc}
+     */
+    public function filterResponse($content)
+    {
+        return mb_substr($content, 2, mb_strlen($content) - 3);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function extractCount(array $data)
     {
-        return $data['count'];
+        return isset($data['count']) ? $data['count'] : 0;
     }
 }

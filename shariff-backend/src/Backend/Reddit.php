@@ -3,15 +3,12 @@
 namespace Heise\Shariff\Backend;
 
 /**
- * Class Reddit
- *
- * @package Heise\Shariff\Backend
+ * Class Reddit.
  */
 class Reddit extends Request implements ServiceInterface
 {
-
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -19,24 +16,27 @@ class Reddit extends Request implements ServiceInterface
     }
 
     /**
-     * @param string $url
-     * @return \GuzzleHttp\Message\Request|\GuzzleHttp\Message\RequestInterface
+     * {@inheritdoc}
      */
     public function getRequest($url)
     {
-        return $this->createRequest('https://www.reddit.com/api/info.json?url='.urlencode($url));
+        return new \GuzzleHttp\Psr7\Request('GET', 'https://www.reddit.com/api/info.json?url='.urlencode($url));
     }
 
     /**
-     * @param array $data
-     * @return int
+     * {@inheritdoc}
      */
     public function extractCount(array $data)
     {
         $count = 0;
-        foreach ($data['data']['children'] as $child) {
-            $count += $child['data']['score'];
+        if (!empty($data['data']['children'])) {
+            foreach ($data['data']['children'] as $child) {
+                if (!empty($child['data']['score'])) {
+                    $count += $child['data']['score'];
+                }
+            }
         }
+
         return $count;
     }
 }

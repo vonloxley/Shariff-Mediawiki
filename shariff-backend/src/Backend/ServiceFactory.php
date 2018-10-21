@@ -2,31 +2,29 @@
 
 namespace Heise\Shariff\Backend;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 
 /**
- * Class ServiceFactory
- *
- * @package Heise\Shariff\Backend
+ * Class ServiceFactory.
  */
 class ServiceFactory
 {
-    /** @var Client */
+    /** @var ClientInterface */
     protected $client;
 
     /** @var ServiceInterface[] */
-    protected $serviceMap = array();
+    protected $serviceMap = [];
 
     /**
-     * @param Client $client
+     * @param ClientInterface $client
      */
-    public function __construct(Client $client)
+    public function __construct(ClientInterface $client)
     {
         $this->client = $client;
     }
 
     /**
-     * @param string $name
+     * @param string           $name
      * @param ServiceInterface $service
      */
     public function registerService($name, ServiceInterface $service)
@@ -37,20 +35,28 @@ class ServiceFactory
     /**
      * @param array $serviceNames
      * @param array $config
+     *
      * @return array
      */
     public function getServicesByName(array $serviceNames, array $config)
     {
-        $services = array();
+        $services = [];
         foreach ($serviceNames as $serviceName) {
-            $services[] = $this->createService($serviceName, $config);
+            try {
+                $service = $this->createService($serviceName, $config);
+            } catch (\InvalidArgumentException $e) {
+                continue;
+            }
+            $services[] = $service;
         }
+
         return $services;
     }
 
     /**
      * @param string $serviceName
-     * @param array $config
+     * @param array  $config
+     *
      * @return ServiceInterface
      */
     protected function createService($serviceName, array $config)
@@ -58,7 +64,10 @@ class ServiceFactory
         if (isset($this->serviceMap[$serviceName])) {
             $service = $this->serviceMap[$serviceName];
         } else {
-            $serviceClass = 'Heise\\Shariff\\Backend\\' . $serviceName;
+            $serviceClass = '\\Heise\\Shariff\\Backend\\'.$serviceName;
+            if (!class_exists($serviceClass)) {
+                throw new \InvalidArgumentException('Invalid service name "' . $serviceName . '".');
+            }
             $service = new $serviceClass($this->client);
         }
 
