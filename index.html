@@ -63,7 +63,7 @@
                         <li>Unpack in the <code>extensions</code>-folder of your mediawiki.</li>
                         <li>Edit <code>Shariff/shariff-backend/index.php</code> and set the key
                             <code>"domain":</code> to your domain name.</li>
-                        <li>Add <code>require_once("$IP/extensions/Shariff/Shariff.php");</code> to
+                        <li>Add <code>wfLoadExtension('Shariff.php');</code> to
                             <code>LocalSettings.php</code>
                         </li>
                         <li>Write <code>{{#shariffLike:}}</code> wherever you want to use social-media-buttons.</li>
