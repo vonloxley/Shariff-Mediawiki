@@ -1,0 +1,32 @@
+{
+	"name": "Shariff",
+	"version": "2.0",
+	"author": "Niki Hansche",
+	"url": "https://github.com/vonloxley/Shariff-Mediawiki",
+	"description": "Insert 2-click \"Like\" buttons.",
+	"license-name": "MIT",
+	"type": "other",
+	"requires": {
+		"MediaWiki": ">= 1.29.0"
+	},
+	"AutoloadClasses": {
+		"Shariff": "Shariff.php"
+	},
+	"ResourceModules": {
+		"ext.Shariff": {
+			"scripts": "shariff.min.js",
+			"styles": "shariff.min.css",
+			"position": "bottom"
+		}
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "",
+		"remoteExtPath": "Shariff"
+	},
+	"Hooks": {
+		"ParserFirstCallInit": "Shariff::shariffLikeParserFunction_Setup",
+		"LanguageGetMagic": "Shariff::shariffLikeParserFunction_Magic",
+		"BeforePageDisplay": "Shariff::shariffLikeParserFeedHead"
+	},
+	"manifest_version": 2
+}
