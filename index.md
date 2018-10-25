@@ -7,7 +7,7 @@ protecting users privacy.
 Setup
 -----
 1. Unpack in the `extensions`-folder of your mediawiki.
-2. Edit `Shariff/shariff-backend/shariff.json` and set the key
+2. Edit `Shariff/shariff-backend/index.php` and set the key
    `"domain":` to your domain name.
 3. Add `require_once("$IP/extensions/Shariff/Shariff.php");` to
    `LocalSettings.php`
