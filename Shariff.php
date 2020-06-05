@@ -7,7 +7,7 @@
  * @package MediaWiki
  * @subpackage Extensions
  * @author Niki Hansche
- * @copyright © 2014-2018 Niki Hansche
+ * @copyright Â© 2014-2018 Niki Hansche
  * @licence The MIT License (MIT)
  */
 
@@ -36,7 +36,7 @@ class Shariff {
 		global $wgScriptPath;
 
 		//Get page title and URL
-		$output = '<div class="shariff noprint" data-backend-url="'.$wgScriptPath.'/extensions/Shariff/shariff-backend/" data-services="[&quot;twitter&quot;,&quot;facebook&quot;,&quot;pinterest&quot;]"></div>';
+		$output = '<div class="shariff noprint" data-lang="$wgLanguageCode" data-backend-url="'.$wgScriptPath.'/extensions/Shariff/shariff-backend/" data-services="[&quot;twitter&quot;,&quot;facebook&quot;,&quot;pinterest&quot;]"></div>';
 
 		return $parser->insertStripItem($output, $parser->mStripState);;
 	}
