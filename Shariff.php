@@ -36,7 +36,7 @@ class Shariff {
 		global $wgScriptPath;
 		global $wgLanguageCode;
 
-		if ($wgLanguageCode == "de-formal" or $wgLanguageCode == "de-AT" or $wgLanguageCode == "de-CH" ) {
+		if (substr($wgLanguageCode, 0, 3) === 'de-') {
 			$datalang = "de";
 			}
 		else {
