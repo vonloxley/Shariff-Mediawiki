@@ -21,7 +21,6 @@
         "ConfigRegistry": {
                 "Shariff": "GlobalVarConfig::newInstance"
         },
-
 	"ResourceModules": {
 		"ext.Shariff": {
 			"scripts": "shariff.min.js",
