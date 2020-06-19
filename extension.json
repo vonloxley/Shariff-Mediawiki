@@ -12,6 +12,16 @@
 	"AutoloadClasses": {
 		"Shariff": "Shariff.php"
 	},
+	"config": {
+                "ShariffServices": {
+                        "value": "twitter,facebook,pinterest",
+                        "description": "configuration of available services"
+                        }
+        },
+        "ConfigRegistry": {
+                "Shariff": "GlobalVarConfig::newInstance"
+        },
+
 	"ResourceModules": {
 		"ext.Shariff": {
 			"scripts": "shariff.min.js",
