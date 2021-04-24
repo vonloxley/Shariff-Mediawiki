@@ -13,15 +13,11 @@
 
 class Shariff {
 	static function shariffLikeParserFunction_Setup( &$parser ) {
+		# Create a magic word
+		MediaWiki\MediaWikiServices::getInstance()->getContentLanguage()->mMagicExtensions['shariffLike'] = ['shariffike', 'ShariffLike'];
 		# Set a function hook associating the "shariffLike_parser" magic word with our function
 		$parser->setFunctionHook( 'shariffLike', 'Shariff::shariffLikeParserFunction_Render' );
 		return true;
-	}
-
-	static function shariffLikeParserFunction_Magic( &$magicWords, $langCode ) {
-	        //Set first parameter to 1 to make it case sensitive
-		$magicWords['shariffLike'] = array( 0, 'ShariffLike' );
-	        return true;
 	}
 
 	static function shariffLikeParserFeedHead(&$out, &$sk) {

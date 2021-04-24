@@ -25,7 +25,6 @@
 	},
 	"Hooks": {
 		"ParserFirstCallInit": "Shariff::shariffLikeParserFunction_Setup",
-		"LanguageGetMagic": "Shariff::shariffLikeParserFunction_Magic",
 		"BeforePageDisplay": "Shariff::shariffLikeParserFeedHead"
 	},
 	"manifest_version": 2
