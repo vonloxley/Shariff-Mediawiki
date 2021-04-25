@@ -19,11 +19,19 @@ class Application
             'ttl' => 60
         ],
         'domains' => [
-            'www.kochwiki.org',
-            'kochwiki.org'
+            'www.heise.de',
+            'www.ct.de'
         ],
         'services' => [
+            'Facebook',
+            'Reddit',
+            'StumbleUpon',
+            'Flattr',
             'Pinterest',
+            'Xing',
+            'AddThis',
+            'Buffer',
+            'Vk'
         ]
     ];
 
