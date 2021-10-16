@@ -42,6 +42,6 @@ class Shariff {
 		//Get page title and URL
 		$output = '<div class="shariff noprint" data-lang="'.$datalang.'" data-backend-url="'.$wgScriptPath.'/extensions/Shariff/shariff-backend/" data-services="[&quot;twitter&quot;,&quot;facebook&quot;,&quot;pinterest&quot;]"></div>';
 
-		return $parser->insertStripItem($output, $parser->mStripState);;
+		return $parser->insertStripItem($output, $parser->getStripState());
 	}
 }
