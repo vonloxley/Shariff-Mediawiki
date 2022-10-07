@@ -10,6 +10,9 @@
  * @copyright © 2014-2018 Niki Hansche
  * @licence The MIT License (MIT)
  */
+use MediaWiki\MediaWikiServices;
+$config = MediaWikiServices::getInstance()->getConfigFactory()->makeConfig( 'Shariff' );
+$services = $config->get ('ShariffServices');
 
 class Shariff {
 	static function shariffLikeParserFunction_Setup( &$parser ) {
@@ -31,6 +34,7 @@ class Shariff {
 		global $wgSitename;
 		global $wgScriptPath;
 		global $wgLanguageCode;
+		global $wgShariffServices;
 
 		if (substr($wgLanguageCode, 0, 3) === 'de-') {
 			$datalang = "de";
@@ -40,7 +44,7 @@ class Shariff {
 		}
 		
 		//Get page title and URL
-		$output = '<div class="shariff noprint" data-lang="'.$datalang.'" data-backend-url="'.$wgScriptPath.'/extensions/Shariff/shariff-backend/" data-services="[&quot;twitter&quot;,&quot;facebook&quot;,&quot;pinterest&quot;]"></div>';
+		$output = '<div class="shariff noprint" data-lang="'.$datalang.'" data-backend-url="'.$wgScriptPath.'/extensions/Shariff/shariff-backend/" data-services="'.$wgShariffServices.'"></div>';
 
 		return $parser->insertStripItem($output, $parser->getStripState());
 	}
